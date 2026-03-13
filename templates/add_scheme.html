@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Scheme - SchemeFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <a href="/admin/dashboard" class="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="glass p-10 rounded-3xl animate-fade-in">
+            <h1 class="text-3xl font-bold mb-10 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Add New Scheme Details</h1>
+            
+            <form action="/admin/add_scheme" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Site Details -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold border-b border-white/10 pb-2">Basic Info</h2>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Scheme Name</label>
+                        <input type="text" name="name" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Who Created (Creator Name)</label>
+                        <input type="text" name="creator" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Official Link</label>
+                        <input type="url" name="link" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Domain Name</label>
+                        <input type="text" name="domain" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="example.gov.in">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Scheme Type</label>
+                        <select name="type" class="w-full bg-[#1a1c2e] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            <option>Education</option>
+                            <option>Agriculture</option>
+                            <option>Health</option>
+                            <option>Pension</option>
+                            <option>Welfare</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-3 text-gray-400">Belongs To (Categories)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Farmer" class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Farmer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Student" class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Student</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Unemployed" class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Unemployed</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Business" class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Business</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold border-b border-white/10 pb-2">Requirements</h2>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Age Requirement (Enter 0 for no limit)</label>
+                        <input type="number" name="age" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Minimum Annual Income (₹)</label>
+                        <input type="number" name="income" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Caste Requirement</label>
+                        <select name="caste" class="w-full bg-[#1a1c2e] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            <option>No Requirement</option>
+                            <option>General</option>
+                            <option>OBC</option>
+                            <option>SC</option>
+                            <option>ST</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Description</label>
+                        <textarea name="description" rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"></textarea>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 pt-6">
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all shadow-xl shadow-blue-500/20">
+                        Publicize Scheme
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

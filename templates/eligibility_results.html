@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - SchemeFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="p-8 bg-[#0b0f19] text-white">
+    <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <h1 class="text-3xl font-bold">Matching Schemes</h1>
+            <a href="/user/dashboard" class="bg-white/10 px-6 py-2 rounded-xl text-sm hover:bg-white/20 transition-all">Back to Home</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for scheme in eligible_schemes %}
+            <div class="glass p-8 rounded-[2rem] border-t-4 border-blue-500 relative overflow-hidden animate-fade-in group">
+                <div class="absolute top-0 right-0 p-4">
+                    <div class="{% if scheme.match_score >= 85 %}bg-gradient-to-r from-green-500 to-emerald-600 shadow-green-500/50{% elif scheme.match_score >= 60 %}bg-gradient-to-r from-blue-500 to-indigo-600 shadow-blue-500/50{% else %}bg-gradient-to-r from-orange-500 to-red-600 shadow-orange-500/50{% endif %} text-white text-xs font-extrabold px-4 py-2 rounded-full shadow-lg border border-white/20 transform transition-transform hover:scale-105">
+                        <span class="text-xl">🎯</span> {{ scheme.match_score }}% Match
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-4 pr-16">{{ scheme.name }}</h3>
+                <p class="text-gray-400 mb-8 border-b border-white/5 pb-6">{{ scheme.description }}</p>
+                
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-gray-500 uppercase tracking-widest mb-1">Caste Req.</div>
+                        <div class="text-sm font-semibold">{{ scheme.caste_requirement }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 uppercase tracking-widest mb-1">Max Income</div>
+                        <div class="text-sm font-semibold">₹{{ scheme.min_annual_income }}</div>
+                    </div>
+                </div>
+
+                <a href="/scheme/view/{{ scheme.id }}" target="_blank" class="mt-8 relative inline-flex items-center justify-center w-full px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl hover:from-purple-500 hover:to-blue-500 hover:shadow-xl hover:-translate-y-1 shadow-blue-500/25 overflow-hidden group">
+                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                    <span class="relative flex items-center gap-2">Apply for this Scheme <span class="group-hover:translate-x-1 transition-transform">🚀</span></span>
+                </a>
+            </div>
+            {% else %}
+            <div class="col-span-2 text-center py-20 glass rounded-3xl">
+                <p class="text-gray-500 text-xl">No perfectly matching schemes found. Try adjusting your details.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

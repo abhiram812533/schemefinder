@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Scheme - SchemeFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; color: white;}
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <a href="/admin/dashboard" class="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="glass p-10 rounded-3xl animate-fade-in shadow-2xl border border-white/10">
+            <h1 class="text-3xl font-bold mb-10 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Edit Scheme Details</h1>
+            
+            <form action="/admin/edit_scheme/{{ scheme.id }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Site Details -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold border-b border-white/10 pb-2">Basic Info</h2>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Scheme Name</label>
+                        <input type="text" name="name" value="{{ scheme.name }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Who Created (Creator Name)</label>
+                        <input type="text" name="creator" value="{{ scheme.creator_name }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Official Link</label>
+                        <input type="url" name="link" value="{{ scheme.link }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Domain Name</label>
+                        <input type="text" name="domain" value="{{ scheme.domain_name }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white" placeholder="example.gov.in">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Scheme Type</label>
+                        <input type="text" name="type" value="{{ scheme.scheme_type }}" class="w-full bg-[#1a1c2e] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-3 text-gray-400">Belongs To (Categories)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Farmer" {% if 'Farmer' in scheme.categories %}checked{% endif %} class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Farmer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Student" {% if 'Student' in scheme.categories %}checked{% endif %} class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Student</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Unemployed" {% if 'Unemployed' in scheme.categories %}checked{% endif %} class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Unemployed</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" name="categories" value="Business" {% if 'Business' in scheme.categories %}checked{% endif %} class="w-5 h-5 rounded border-white/10 bg-white/5 checked:bg-blue-600 transition-all">
+                                <span class="text-sm text-gray-300 group-hover:text-white transition-colors">Business</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold border-b border-white/10 pb-2">Requirements</h2>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Age Requirement (Enter 0 for no limit)</label>
+                        <input type="number" name="age" value="{{ scheme.age_requirement }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Minimum Annual Income Limit (₹)</label>
+                        <input type="number" name="income" value="{{ scheme.min_annual_income }}" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Caste Requirement</label>
+                        <select name="caste" class="w-full bg-[#1a1c2e] border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">
+                            <option value="No Requirement" {% if scheme.caste_requirement == 'No Requirement' %}selected{% endif %}>No Requirement</option>
+                            <option value="General" {% if 'General' in scheme.caste_requirement or scheme.caste_requirement == 'General' %}selected{% endif %}>General</option>
+                            <option value="OBC" {% if 'OBC' in scheme.caste_requirement or scheme.caste_requirement == 'OBC' %}selected{% endif %}>OBC</option>
+                            <option value="SC" {% if 'SC' in scheme.caste_requirement %}selected{% endif %}>SC</option>
+                            <option value="ST" {% if 'ST' in scheme.caste_requirement %}selected{% endif %}>ST</option>
+                            <option value="SC, ST" {% if scheme.caste_requirement == 'SC, ST' %}selected{% endif %}>SC, ST</option>
+                            <option value="Minority" {% if 'Minority' in scheme.caste_requirement %}selected{% endif %}>Minority</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-gray-400">Description</label>
+                        <textarea name="description" rows="5" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-white">{{ scheme.description }}</textarea>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 pt-6">
+                    <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transform hover:-translate-y-1">
+                        💾 Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
