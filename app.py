@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import mysql.connector
+import pymysql
+import pymysql.cursors
 from werkzeug.security import generate_password_hash, check_password_hash
 import google.generativeai as genai
 import os
@@ -16,20 +17,19 @@ db_config = {
     'password': os.getenv('DB_PASSWORD', 'PpzUNJyDdDhBE0z8'),
     'database': os.getenv('DB_NAME', 'test'),
     'port': int(os.getenv('DB_PORT', 4000)),
-    'ssl_verify_cert': True,
-    'ssl_verify_identity': True
+    'ssl': {'ca': None}  # Enables SSL but skips verification for Cloud maturity
 }
 
 # Gemini AI Configuration
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyByI5U7dRYhDzLZnjgZVtaQwesqUr0I1c4')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyB_sAiO0Zm2oruEAbdxw6ccoIoEiCUhQoc')
 genai.configure(api_key=GEMINI_API_KEY)
 ai_model = genai.GenerativeModel('gemini-flash-latest')
 
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(**db_config)
+        conn = pymysql.connect(**db_config)
         return conn, None
-    except mysql.connector.Error as err:
+    except pymysql.Error as err:
         print(f"Database Error: {err}")
         return None, str(err)
 
@@ -52,7 +52,7 @@ def customer_login_page():
             flash(f"Database error: {err}", "error")
             return redirect(url_for('customer_login_page'))
 
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE username = %s AND role = 'customer'", (username,))
         user = cursor.fetchone()
         cursor.close()
@@ -151,7 +151,7 @@ def customer_all_users():
         conn, err = get_db_connection()
         if not conn:
             return f"Database Connection Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE role = 'user' ORDER BY created_at DESC")
         customers = cursor.fetchall()
         cursor.close()
@@ -170,7 +170,7 @@ def change_password():
         
         conn, err = get_db_connection()
         if not conn: return f"Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT password FROM users WHERE id = %s", (session['user_id'],))
         user = cursor.fetchone()
         
@@ -274,7 +274,7 @@ def forgot_password():
         conn, err = get_db_connection()
         if not conn:
             return f"Database Connection Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE mobile = %s", (mobile,))
         user = cursor.fetchone()
         
@@ -297,7 +297,7 @@ def admin_dashboard():
         conn, err = get_db_connection()
         if not conn:
             return f"Database Connection Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM schemes ORDER BY created_at DESC")
         schemes = cursor.fetchall()
         cursor.close()
@@ -343,7 +343,7 @@ def admin_analytics():
         conn, err = get_db_connection()
         if not conn:
             return f"Database Connection Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT name, views FROM schemes")
         data = cursor.fetchall()
         cursor.close()
@@ -358,7 +358,7 @@ def edit_scheme(id):
         if not conn:
             return f"Database Connection Error: {err}", 500
             
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         
         if request.method == 'GET':
             cursor.execute("SELECT * FROM schemes WHERE id = %s", (id,))
@@ -421,7 +421,7 @@ def user_dashboard():
         conn, err = get_db_connection()
         if not conn:
             return f"Database Connection Error: {err}", 500
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM schemes ORDER BY created_at DESC")
         schemes = cursor.fetchall()
         cursor.close()
@@ -445,7 +445,7 @@ def eligibility_check():
             conn, err = get_db_connection()
             if not conn:
                 return f"Database Connection Error: {err}", 500
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute("SELECT * FROM schemes")
             schemes = cursor.fetchall()
             cursor.close()
@@ -588,7 +588,7 @@ def ai_chat():
     # Get schemes for context to make the AI smarter
     conn, err = get_db_connection()
     if conn:
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT name, categories, description FROM schemes")
         schemes = cursor.fetchall()
         cursor.close()
@@ -616,8 +616,11 @@ def ai_chat():
         response = ai_model.generate_content([system_prompt, user_message])
         return jsonify({'reply': response.text})
     except Exception as e:
-        print(f"AI Error: {str(e)}")
-        return jsonify({'reply': "I'm having a minor technical glitch. Please ensure the Gemini API key is properly configured in app.py!"})
+        error_msg = str(e)
+        print(f"AI Error: {error_msg}")
+        # Safely slice the error message for the response
+        display_error = error_msg[:100] if len(error_msg) > 100 else error_msg
+        return jsonify({'reply': f"I'm having a minor technical glitch. (Error: {display_error}...). Please ensure your GEMINI_API_KEY is correctly set in Vercel settings!"})
 
 if __name__ == '__main__':
     app.run(debug=True)
